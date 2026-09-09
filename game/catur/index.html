@@ -1,0 +1,643 @@
+<style>
+* {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: transparent;
+    color: #e8f1ff;
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    overflow: hidden;
+}
+
+/* =========================
+   KAORI WRAPPER
+========================= */
+
+.wrapper {
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+    padding: 10px;
+}
+
+/* =========================
+   MAIN CARD
+========================= */
+
+.card {
+    position: relative;
+    padding: 14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(12, 20, 34, .98),
+            rgba(7, 13, 24, .98)
+        );
+
+    border: 1px solid rgba(104, 182, 255, .35);
+    border-radius: 18px;
+
+    box-shadow:
+        0 18px 50px rgba(0, 0, 0, .65),
+        inset 0 1px 0 rgba(255,255,255,.05);
+
+    overflow: hidden;
+}
+
+/* subtle Kaori line */
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(104,182,255,.8),
+            transparent
+        );
+
+    opacity: .7;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.6px;
+
+    color: #68b6ff;
+    text-transform: uppercase;
+}
+
+.title .dot {
+    width: 7px;
+    height: 7px;
+
+    background: #68b6ff;
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 0 3px rgba(104,182,255,.10);
+}
+
+.status {
+    max-width: 150px;
+
+    padding: 5px 9px;
+
+    background: rgba(255,255,255,.045);
+
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+
+    color: #cbd5e1;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* =========================
+   CHESS BOARD
+========================= */
+
+#board-container {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 1;
+
+    padding: 4px;
+
+    background: #08111f;
+
+    border: 1px solid rgba(104,182,255,.25);
+    border-radius: 13px;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.45),
+        inset 0 0 0 1px rgba(255,255,255,.025);
+
+    overflow: hidden;
+}
+
+#board {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+
+    overflow: hidden;
+
+    border-radius: 9px;
+}
+
+/* =========================
+   SQUARE
+========================= */
+
+.sq {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    font-size: clamp(24px, 7vw, 34px);
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background .16s ease,
+        filter .16s ease;
+}
+
+/* light square */
+
+.sq.w {
+    background: #dcecff;
+}
+
+/* dark square */
+
+.sq.b {
+    background: #6090bd;
+}
+
+/* subtle square highlight */
+
+.sq:hover {
+    filter: brightness(1.08);
+}
+
+/* =========================
+   PIECES
+========================= */
+
+.sq span {
+    position: relative;
+    z-index: 2;
+
+    transform-origin: center;
+
+    font-family:
+        "Arial Unicode MS",
+        "Segoe UI Symbol",
+        serif;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease;
+}
+
+.sq:active span {
+    transform: scale(.92);
+}
+
+/* =========================
+   VALID MOVE
+========================= */
+
+.sq.hl::after {
+    content: "";
+
+    position: absolute;
+
+    width: 22%;
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+
+    background: rgba(15, 23, 42, .30);
+
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,.08);
+
+    z-index: 1;
+}
+
+/* capture indicator */
+
+.sq.hl:has(span)::after {
+    width: 72%;
+    height: 72%;
+
+    background: transparent;
+
+    border: 3px solid rgba(15,23,42,.28);
+}
+
+/* =========================
+   SELECTED
+========================= */
+
+.sq.sel {
+    background: #68b6ff !important;
+
+    box-shadow:
+        inset 0 0 0 3px rgba(255,255,255,.35),
+        inset 0 0 18px rgba(255,255,255,.15);
+}
+
+/* =========================
+   CHECK
+========================= */
+
+.sq.check {
+    background: #e05b6f !important;
+
+    box-shadow:
+        inset 0 0 25px rgba(190,30,60,.55);
+}
+
+/* =========================
+   LAST MOVE
+========================= */
+
+.sq.last-move {
+    background: #8db9df !important;
+
+    box-shadow:
+        inset 0 0 0 2px rgba(104,182,255,.75),
+        inset 0 0 18px rgba(104,182,255,.25);
+}
+
+/* =========================
+   PIECE ANIMATION
+========================= */
+
+@keyframes pieceDrop {
+    0% {
+        opacity: 0;
+        transform:
+            translateY(-10px)
+            scale(.72);
+    }
+
+    65% {
+        opacity: 1;
+        transform:
+            translateY(2px)
+            scale(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+.piece-moved {
+    display: inline-block;
+
+    animation:
+        pieceDrop .25s
+        cubic-bezier(.2,.8,.2,1)
+        forwards;
+}
+
+/* =========================
+   GAME OVER
+========================= */
+
+#game-overlay {
+    display: none;
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 10;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    background:
+        rgba(5, 12, 22, .88);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+#overlay-msg {
+    color: #68b6ff;
+
+    font-size: clamp(22px, 7vw, 30px);
+    font-weight: 950;
+
+    letter-spacing: .5px;
+
+    text-align: center;
+
+    text-shadow:
+        0 5px 20px rgba(0,0,0,.5);
+}
+
+.reset-btn {
+    margin-top: 16px;
+
+    padding: 9px 16px;
+
+    background: #68b6ff;
+
+    border: none;
+    border-radius: 9px;
+
+    color: #06111f;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 18px rgba(104,182,255,.22);
+
+    transition:
+        transform .15s ease,
+        filter .15s ease;
+}
+
+.reset-btn:active {
+    transform: scale(.94);
+}
+
+.reset-btn:hover {
+    filter: brightness(1.08);
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.controls {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr 1fr;
+
+    gap: 7px;
+
+    margin-top: 10px;
+}
+
+.btn {
+    min-width: 0;
+
+    padding: 10px 7px;
+
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 9px;
+
+    background: rgba(255,255,255,.045);
+
+    color: #dcecff;
+
+    font-size: 11px;
+    font-weight: 850;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        border-color .15s ease;
+}
+
+.btn:hover {
+    background: rgba(255,255,255,.075);
+}
+
+.btn:active {
+    transform: scale(.95);
+}
+
+/* AI */
+
+.btn-ai {
+    background:
+        rgba(104,182,255,.12);
+
+    border-color:
+        rgba(104,182,255,.30);
+
+    color: #8ecaff;
+}
+
+/* PVP */
+
+.btn-pvp {
+    background:
+        rgba(255,255,255,.045);
+
+    color: #cbd5e1;
+}
+
+/* RESET */
+
+.btn-reset {
+    background:
+        rgba(224,91,111,.10);
+
+    border-color:
+        rgba(224,91,111,.25);
+
+    color: #ff9aaa;
+}
+
+/* active */
+
+.btn.active {
+    background:
+        rgba(104,182,255,.18);
+
+    border-color:
+        rgba(104,182,255,.65);
+
+    color: #fff;
+
+    box-shadow:
+        0 0 0 1px rgba(104,182,255,.08);
+}
+
+/* =========================
+   CREDIT
+========================= */
+
+.credit-bar {
+    margin-top: 10px;
+    padding-top: 9px;
+
+    border-top:
+        1px solid rgba(255,255,255,.07);
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 1.3px;
+
+    text-transform: uppercase;
+}
+
+.credit-bar span {
+    color: #68b6ff;
+}
+
+/* =========================
+   SMALL SCREEN
+========================= */
+
+@media (max-width: 360px) {
+
+    .wrapper {
+        padding: 7px;
+    }
+
+    .card {
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    .header {
+        margin-bottom: 9px;
+    }
+
+    .status {
+        font-size: 9px;
+        padding: 4px 7px;
+    }
+
+    .btn {
+        padding: 9px 4px;
+        font-size: 10px;
+    }
+
+}
+</style>
+
+<body>
+
+<div class="wrapper">
+
+    <div class="card">
+
+        <div class="header">
+
+            <div class="title">
+                <span class="dot"></span>
+                KAORI-MD CHESS
+            </div>
+
+            <div class="status" id="status">
+                White to move
+            </div>
+
+        </div>
+
+        <div id="board-container">
+
+            <div id="board"></div>
+
+            <div id="game-overlay">
+
+                <div id="overlay-msg"></div>
+
+                <div
+                    class="reset-btn"
+                    id="overlay-reset"
+                >
+                    ↻ PLAY AGAIN
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="controls">
+
+            <button
+                class="btn btn-ai active"
+                id="btn-ai"
+            >
+                ♟ AI Auto
+            </button>
+
+            <button
+                class="btn btn-pvp"
+                id="btn-pvp"
+            >
+                ♙ 2 Player
+            </button>
+
+            <button
+                class="btn btn-reset"
+                id="btn-reset"
+            >
+                ↻ Reset
+            </button>
+
+        </div>
+
+        <div class="credit-bar">
+            Engineered by
+            <span>Kaori-MD</span>
+        </div>
+
+    </div>
+
+</div>
